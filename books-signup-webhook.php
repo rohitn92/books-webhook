@@ -4,6 +4,11 @@
 
 <?php
 
+require('../rslibrary/helper.php');
+include_once($_SERVER['DOCUMENT_ROOT'].'/rslibrary/site_config.php');
+include_once($_SERVER['DOCUMENT_ROOT'].'/rslibrary/config.php');
+include_once($_SERVER['DOCUMENT_ROOT'].'/registration/models/VoucherUser.php');
+
 $data = json_decode(file_get_contents("php://input"));
 $data = (array) $data;
 
@@ -39,13 +44,38 @@ if (isset($email)) {
 $phone = preg_replace("/[^0-9]/", '', $phone);
 if (!strlen($phone) == 10) $phone = '';
 
+$myData = array(
+		'first_name' => $first_name,
+		'last_name' => $last_name,
+		'email' => $email,
+		'email_confirm' => $email,
+		'voucher_code' => 'ShawAcademy',
+		'tel_number' => $phone,
+		
+	);
 
+$courseId = '';
 
+$userId = createUpdateUser($email, $first_name, $last_name, $country, $password);
 
+echo $userId."<br />"; 
 
+$voucherUser = new VoucherUser($myData);
+	$voucherUser->validVoucher = true;
+	$voucherUser->set__Partner('ShawAcademy');
+$voucherUser->saveToSalesforce();
 
+/*$courses = getCourses(true);
+while($course = $courses->fetch_assoc()){
+    if ($course['CourseName']==$lesson) {
+    	$courseId = $course['CourseId'] ;
+    	break;
+    }
+}
 
-
+echo $courseId;
+echo assignCourseToUser($email, $courseId, null, 'GMT');
+*/
 ?>
 
 </body>
